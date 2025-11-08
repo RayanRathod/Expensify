@@ -23,12 +23,8 @@ export default function TransactionList({
   const user = useSelector((state) => state.auth.user);
 
   function categoryName(id) {
-    if (!user) {
-      return "Loading";
-    }
-    const category = user.categories.find(
-      (category) => category._id === id
-    );
+    if (!user) return "Loading...";
+    const category = user.categories.find((c) => c._id === id);
     return category ? category.icon : "N/A";
   }
 
@@ -39,14 +35,10 @@ export default function TransactionList({
       `${process.env.REACT_APP_API_URL}/transaction/${_id}`,
       {
         method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       }
     );
-    if (res.ok) {
-      fetchTransactions();
-    }
+    if (res.ok) fetchTransactions();
   }
 
   function formatDate(date) {
@@ -55,47 +47,101 @@ export default function TransactionList({
 
   return (
     <>
-      <Typography variant="h6">List of Transactions</Typography>
-      <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} aria-label="simple table">
-          <TableHead>
+      <Typography
+        variant="h5"
+        sx={{
+          fontWeight: "bold",
+          textAlign: "center",
+          mt: 6,
+          mb: 2,
+          letterSpacing: 0.5,
+          color: "#1e3c72",
+        }}
+      >
+        Transaction Records
+      </Typography>
+
+      <TableContainer
+        component={Paper}
+        sx={{
+          boxShadow: "0 8px 20px rgba(0,0,0,0.15)",
+          borderRadius: 3,
+          overflow: "hidden",
+        }}
+      >
+        <Table sx={{ minWidth: 650 }} aria-label="styled table">
+          <TableHead
+            sx={{
+              background: "linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)",
+            }}
+          >
             <TableRow>
-              <TableCell align="center">Amount</TableCell>
-              <TableCell align="center">Description</TableCell>
-              <TableCell align="center">Category</TableCell>
-              <TableCell align="center">Date</TableCell>
-              <TableCell align="center">Actions</TableCell>
+              {["Amount (₹)", "Description", "Category", "Date", "Actions"].map(
+                (head) => (
+                  <TableCell
+                    key={head}
+                    align="center"
+                    sx={{
+                      color: "white",
+                      fontWeight: "bold",
+                      textTransform: "uppercase",
+                      letterSpacing: 0.5,
+                    }}
+                  >
+                    {head}
+                  </TableCell>
+                )
+              )}
             </TableRow>
           </TableHead>
+
           <TableBody>
             {data.map((month) =>
-              month.transactions.map((row) => (
+              month.transactions.map((row, i) => (
                 <TableRow
                   key={row._id}
-                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                  sx={{
+                    backgroundColor: i % 2 === 0 ? "#f7faff" : "#edf3ff",
+                    "&:hover": {
+                      backgroundColor: "#dce7ff",
+                      transition: "0.3s ease",
+                    },
+                  }}
                 >
-                  <TableCell align="center" component="th" scope="row">
-                    {row.amount} €
+                  <TableCell align="center" sx={{ fontWeight: 600 }}>
+                    ₹{row.amount}
                   </TableCell>
                   <TableCell align="center">{row.description}</TableCell>
-                  <TableCell align="center" sx={{ fontSize: 20 }}>
+                  <TableCell align="center" sx={{ fontSize: 18 }}>
                     {categoryName(row.category_id)}
                   </TableCell>
                   <TableCell align="center">{formatDate(row.date)}</TableCell>
                   <TableCell align="center">
                     <IconButton
-                      color="warning"
-                      component="label"
+                      color="primary"
                       onClick={() => setEditTransaction(row)}
                       disabled={editTransaction.amount !== undefined}
+                      sx={{
+                        transition: "0.3s",
+                        "&:hover": {
+                          transform: "scale(1.1)",
+                          color: "#00b0ff",
+                        },
+                      }}
                     >
                       <EditSharpIcon />
                     </IconButton>
                     <IconButton
                       color="error"
-                      component="label"
                       onClick={() => remove(row._id)}
                       disabled={editTransaction.amount !== undefined}
+                      sx={{
+                        transition: "0.3s",
+                        "&:hover": {
+                          transform: "scale(1.1)",
+                          color: "#ff1744",
+                        },
+                      }}
                     >
                       <DeleteSharpIcon />
                     </IconButton>

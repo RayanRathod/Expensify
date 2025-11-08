@@ -1,149 +1,217 @@
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
-import Typography from "@mui/material/Typography";
-import { TextField } from "@mui/material";
-import Button from "@mui/material/Button";
-import Box from "@mui/material/Box";
-import Autocomplete from "@mui/material/Autocomplete";
+import {
+  Card,
+  CardContent,
+  Typography,
+  TextField,
+  Button,
+  Box,
+  Autocomplete,
+  IconButton,
+} from "@mui/material";
+import { Category, AttachMoney, ShoppingCart, TrendingUp } from "@mui/icons-material";
 import Cookies from "js-cookie";
 import { setUser } from "../store/auth";
 
-const InitialForm = {
+const initialCategory = {
   label: "",
   icon: "",
 };
 
-const icons = ["🚗", "🛒", "🧾", "📈"];
+const iconOptions = [
+  { label: "Car", icon: <Category /> },
+  { label: "Shopping", icon: <ShoppingCart /> },
+  { label: "Bills", icon: <AttachMoney /> },
+  { label: "Growth", icon: <TrendingUp /> },
+];
 
 export default function CategoryForm({ editCategory, setEditCategory }) {
   const user = useSelector((state) => state.auth.user);
   const token = Cookies.get("token");
   const dispatch = useDispatch();
-  const [form, setForm] = useState(InitialForm);
-  const [editMode, setEditMode] = useState(false);
+  const [form, setForm] = useState(initialCategory);
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
-    if (editCategory._id !== undefined) {
+    if (editCategory?._id) {
       setForm(editCategory);
-      setEditMode(true);
+      setIsEditing(true);
     } else {
-      setForm(InitialForm);
-      setEditMode(false);
+      setForm(initialCategory);
+      setIsEditing(false);
     }
   }, [editCategory]);
 
-  function handleChange(e) {
+  const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
-  }
+  };
 
-  function handleSubmit(e) {
-    e.preventDefault();
-    editMode ? update() : create();
-  }
-
-  function handleCancel() {
-    setForm(InitialForm);
-    setEditMode(false);
+  const handleCancel = () => {
+    setForm(initialCategory);
     setEditCategory({});
-  }
+    setIsEditing(false);
+  };
 
-  function reload(res, _user) {
+  const reload = (res, updatedUser) => {
     if (res.ok) {
-      setForm(InitialForm);
-      setEditMode(false);
+      setForm(initialCategory);
       setEditCategory({});
-      dispatch(setUser({ user: _user }));
+      setIsEditing(false);
+      dispatch(setUser({ user: updatedUser }));
     }
-  }
+  };
 
-  async function create() {
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    isEditing ? updateCategory() : addCategory();
+  };
+
+  const addCategory = async () => {
     const res = await fetch(`${process.env.REACT_APP_API_URL}/category`, {
       method: "POST",
       body: JSON.stringify(form),
       headers: {
-        "content-type": "application/json",
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
     });
-    const _user = {
+    const updatedUser = {
       ...user,
       categories: [...user.categories, { ...form }],
     };
-    reload(res, _user);
-  }
+    reload(res, updatedUser);
+  };
 
-  async function update() {
+  const updateCategory = async () => {
     const res = await fetch(
       `${process.env.REACT_APP_API_URL}/category/${editCategory._id}`,
       {
         method: "PATCH",
         body: JSON.stringify(form),
         headers: {
-          "content-type": "application/json",
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
       }
     );
-    const _user = {
+    const updatedUser = {
       ...user,
       categories: user.categories.map((cat) =>
-        cat._id == editCategory._id ? form : cat
+        cat._id === editCategory._id ? form : cat
       ),
     };
-    reload(res, _user);
-  }
-
-  function getCategoryNameById() {
-    return (
-      user.categories.find((category) => category._id === form.category_id) ??
-      ""
-    );
-  }
+    reload(res, updatedUser);
+  };
 
   return (
-    <Card sx={{ minWidth: 275, marginTop: 10 }}>
+    <Card
+      sx={{
+        minWidth: 320,
+        mt: 10,
+        mx: "auto",
+        borderRadius: 3,
+        boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
+        background: "linear-gradient(135deg, #6a11cb 0%, #2575fc 100%)",
+        color: "#fff",
+      }}
+    >
       <CardContent>
-        <Typography variant="h6" sx={{ marginBottom: 2 }}>
-          Add New Category
+        <Typography
+          variant="h6"
+          sx={{
+            mb: 2,
+            textAlign: "center",
+            fontWeight: 600,
+            letterSpacing: 0.5,
+          }}
+        >
+          {isEditing ? "Edit Expense Category" : "Add Expense Category"}
         </Typography>
-        <Box component="form" onSubmit={handleSubmit} sx={{ display: "flex" }}>
+
+        <Box
+          component="form"
+          onSubmit={handleSubmit}
+          sx={{
+            display: "flex",
+            gap: 2,
+            flexWrap: "wrap",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
           <TextField
-            type="text"
-            sx={{ marginRight: 5 }}
-            id="outlined-basic"
-            label="Label"
+            label="Category Name"
             name="label"
-            variant="outlined"
-            size="small"
             value={form.label}
             onChange={handleChange}
-          />
-          <Autocomplete
-            value={getCategoryNameById()}
-            onChange={(event, newValue) => {
-              setForm({ ...form, icon: newValue });
+            variant="outlined"
+            size="small"
+            sx={{
+              bgcolor: "white",
+              borderRadius: 1,
+              width: "220px",
             }}
-            id="icons"
-            options={icons}
-            sx={{ width: 200, marginRight: 5 }}
+          />
+
+          <Autocomplete
+            options={iconOptions}
+            getOptionLabel={(option) => option.label}
+            onChange={(e, newValue) =>
+              setForm({ ...form, icon: newValue?.label || "" })
+            }
+            renderOption={(props, option) => (
+              <Box component="li" {...props} sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <IconButton size="small" color="primary">
+                  {option.icon}
+                </IconButton>
+                {option.label}
+              </Box>
+            )}
             renderInput={(params) => (
-              <TextField {...params} size="small" label="Icon" />
+              <TextField
+                {...params}
+                label="Select Icon"
+                size="small"
+                sx={{ bgcolor: "white", borderRadius: 1, width: "220px" }}
+              />
             )}
           />
-          {editMode ? (
+
+          {isEditing ? (
             <>
-              <Button type="submit" color="success" variant="outlined">
+              <Button
+                type="submit"
+                variant="contained"
+                sx={{
+                  bgcolor: "#00e676",
+                  "&:hover": { bgcolor: "#00c853" },
+                }}
+              >
                 Update
               </Button>
-              <Button variant="secondary" onClick={handleCancel}>
+              <Button
+                variant="outlined"
+                sx={{
+                  color: "#fff",
+                  borderColor: "#fff",
+                  "&:hover": { bgcolor: "rgba(255,255,255,0.1)" },
+                }}
+                onClick={handleCancel}
+              >
                 Cancel
               </Button>
             </>
           ) : (
-            <Button type="submit" color="success" variant="contained">
-              Submit
+            <Button
+              type="submit"
+              variant="contained"
+              sx={{
+                bgcolor: "#00e5ff",
+                "&:hover": { bgcolor: "#00b8d4" },
+              }}
+            >
+              Add
             </Button>
           )}
         </Box>

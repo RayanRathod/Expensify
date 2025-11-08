@@ -26,6 +26,7 @@ export default function Login() {
       email: data.get("email"),
       password: data.get("password"),
     };
+
     const res = await fetch(`${process.env.REACT_APP_API_URL}/auth/login`, {
       method: "POST",
       body: JSON.stringify(form),
@@ -42,7 +43,6 @@ export default function Login() {
       navigate("/");
     } else {
       alert("Wrong email or password!");
-      return;
     }
   };
 
@@ -53,65 +53,135 @@ export default function Login() {
   };
 
   return (
-    <Container component="main" maxWidth="xs">
-      <CssBaseline />
-      <Box
-        sx={{
-          marginTop: 8,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-        }}
-      >
-        <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
-          <LockOutlinedIcon />
-        </Avatar>
-        <Typography component="h1" variant="h5">
-          Sign in
-        </Typography>
-        <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            id="email"
-            label="Email Address"
-            name="email"
-            autoComplete="email"
-            autoFocus
-            onChange={handleFieldChange}
-          />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            name="password"
-            label="Password"
-            type="password"
-            id="password"
-            autoComplete="current-password"
-            onChange={handleFieldChange}
-          />
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            sx={{ mt: 3, mb: 2 }}
-            disabled={fieldsEmpty}
+    <Box
+      sx={{
+        minHeight: "100vh",
+        background:
+          "linear-gradient(135deg, #1E3C72 0%, #2A5298 50%, #6A5ACD 100%)",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        color: "white",
+      }}
+    >
+      <Container component="main" maxWidth="xs">
+        <CssBaseline />
+        <Box
+          sx={{
+            padding: 4,
+            borderRadius: 4,
+            backgroundColor: "rgba(255, 255, 255, 0.15)",
+            backdropFilter: "blur(12px)",
+            boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
+            textAlign: "center",
+          }}
+        >
+          <Avatar
+            sx={{
+              m: "auto",
+              mb: 2,
+              bgcolor: "rgba(255,255,255,0.3)",
+              color: "#1E3C72",
+            }}
           >
-            Sign In
-          </Button>
-          <Grid container>
-            <Grid item>
-              <RouterLink to="/register">
-                <Link component="span" variant="body2">
-                  {"Don't have an account? Sign Up"}
-                </Link>
-              </RouterLink>
+            <LockOutlinedIcon />
+          </Avatar>
+          <Typography
+            component="h1"
+            variant="h5"
+            sx={{
+              fontWeight: "bold",
+              mb: 3,
+              textShadow: "1px 1px 10px rgba(0,0,0,0.3)",
+            }}
+          >
+            Sign In to Expense Tracker
+          </Typography>
+
+          <Box component="form" onSubmit={handleSubmit} noValidate>
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              id="email"
+              label="Email Address"
+              name="email"
+              autoComplete="email"
+              autoFocus
+              onChange={handleFieldChange}
+              InputLabelProps={{
+                style: { color: "#E0E0E0" },
+              }}
+              InputProps={{
+                style: {
+                  color: "white",
+                  borderColor: "#E0E0E0",
+                },
+              }}
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              name="password"
+              label="Password"
+              type="password"
+              id="password"
+              autoComplete="current-password"
+              onChange={handleFieldChange}
+              InputLabelProps={{
+                style: { color: "#E0E0E0" },
+              }}
+              InputProps={{
+                style: {
+                  color: "white",
+                },
+              }}
+            />
+
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{
+                mt: 3,
+                mb: 2,
+                background:
+                  "linear-gradient(135deg, #6A5ACD 0%, #1E90FF 100%)",
+                borderRadius: "30px",
+                fontWeight: "bold",
+                textTransform: "none",
+                boxShadow: "0px 4px 15px rgba(0,0,0,0.3)",
+                transition: "0.3s",
+                "&:hover": {
+                  transform: "translateY(-3px)",
+                  boxShadow: "0px 8px 25px rgba(0,0,0,0.5)",
+                },
+              }}
+              disabled={fieldsEmpty}
+            >
+              Sign In
+            </Button>
+
+            <Grid container justifyContent="center">
+              <Grid item>
+                <RouterLink to="/register" style={{ textDecoration: "none" }}>
+                  <Link
+                    component="span"
+                    variant="body2"
+                    sx={{
+                      color: "#BBDEFB",
+                      "&:hover": { textDecoration: "underline" },
+                    }}
+                  >
+                    Don’t have an account? Sign Up
+                  </Link>
+                </RouterLink>
+              </Grid>
             </Grid>
-          </Grid>
+          </Box>
         </Box>
-      </Box>
-    </Container>
+      </Container>
+    </Box>
   );
 }

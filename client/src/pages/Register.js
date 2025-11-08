@@ -24,6 +24,7 @@ export default function Register() {
       email: data.get("email"),
       password: data.get("password"),
     };
+
     const res = await fetch(`${process.env.REACT_APP_API_URL}/auth/register`, {
       method: "POST",
       body: JSON.stringify(form),
@@ -31,11 +32,11 @@ export default function Register() {
         "content-type": "application/json",
       },
     });
+
     if (res.ok) {
       navigate("/login");
     } else {
-      alert("Email address is already in the system!");
-      return;
+      alert("Email address already exists!");
     }
   };
 
@@ -46,91 +47,168 @@ export default function Register() {
   };
 
   return (
-    <Container component="main" maxWidth="xs">
-      <CssBaseline />
-      <Box
-        sx={{
-          marginTop: 8,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-        }}
-      >
-        <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
-          <LockOutlinedIcon />
-        </Avatar>
-        <Typography component="h1" variant="h5">
-          Sign up
-        </Typography>
-        <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                autoComplete="given-name"
-                name="firstName"
-                required
-                fullWidth
-                id="firstName"
-                label="First Name"
-                autoFocus
-                onChange={handleFieldChange}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                required
-                fullWidth
-                id="lastName"
-                label="Last Name"
-                name="lastName"
-                autoComplete="family-name"
-                onChange={handleFieldChange}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                required
-                fullWidth
-                id="email"
-                label="Email Address"
-                name="email"
-                autoComplete="email"
-                onChange={handleFieldChange}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                required
-                fullWidth
-                name="password"
-                label="Password"
-                type="password"
-                id="password"
-                autoComplete="new-password"
-                onChange={handleFieldChange}
-              />
-            </Grid>
-          </Grid>
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            sx={{ mt: 3, mb: 2 }}
-            disabled={fieldsEmpty}
+    <Box
+      sx={{
+        minHeight: "100vh",
+        background:
+          "linear-gradient(135deg, #1E3C72 0%, #2A5298 50%, #6A5ACD 100%)",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        color: "white",
+      }}
+    >
+      <Container component="main" maxWidth="xs">
+        <CssBaseline />
+        <Box
+          sx={{
+            padding: 4,
+            borderRadius: 4,
+            backgroundColor: "rgba(255, 255, 255, 0.15)",
+            backdropFilter: "blur(12px)",
+            boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
+            textAlign: "center",
+          }}
+        >
+          <Avatar
+            sx={{
+              m: "auto",
+              mb: 2,
+              bgcolor: "rgba(255,255,255,0.3)",
+              color: "#1E3C72",
+            }}
           >
-            Sign Up
-          </Button>
-          <Grid container justifyContent="flex-end">
-            <Grid item>
-              <RouterLink to="/login">
-                <Link component="span" variant="body2">
-                  Already have an account? Sign in
-                </Link>
-              </RouterLink>
+            <LockOutlinedIcon />
+          </Avatar>
+          <Typography
+            component="h1"
+            variant="h5"
+            sx={{
+              fontWeight: "bold",
+              mb: 3,
+              textShadow: "1px 1px 10px rgba(0,0,0,0.3)",
+            }}
+          >
+            Create Your Account
+          </Typography>
+
+          <Box component="form" noValidate onSubmit={handleSubmit}>
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  autoComplete="given-name"
+                  name="firstName"
+                  required
+                  fullWidth
+                  id="firstName"
+                  label="First Name"
+                  autoFocus
+                  onChange={handleFieldChange}
+                  InputLabelProps={{ style: { color: "#E0E0E0" } }}
+                  InputProps={{
+                    style: {
+                      color: "white",
+                    },
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  required
+                  fullWidth
+                  id="lastName"
+                  label="Last Name"
+                  name="lastName"
+                  autoComplete="family-name"
+                  onChange={handleFieldChange}
+                  InputLabelProps={{ style: { color: "#E0E0E0" } }}
+                  InputProps={{
+                    style: {
+                      color: "white",
+                    },
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  required
+                  fullWidth
+                  id="email"
+                  label="Email Address"
+                  name="email"
+                  autoComplete="email"
+                  onChange={handleFieldChange}
+                  InputLabelProps={{ style: { color: "#E0E0E0" } }}
+                  InputProps={{
+                    style: {
+                      color: "white",
+                    },
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  required
+                  fullWidth
+                  name="password"
+                  label="Password"
+                  type="password"
+                  id="password"
+                  autoComplete="new-password"
+                  onChange={handleFieldChange}
+                  InputLabelProps={{ style: { color: "#E0E0E0" } }}
+                  InputProps={{
+                    style: {
+                      color: "white",
+                    },
+                  }}
+                />
+              </Grid>
             </Grid>
-          </Grid>
+
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{
+                mt: 3,
+                mb: 2,
+                background:
+                  "linear-gradient(135deg, #6A5ACD 0%, #1E90FF 100%)",
+                borderRadius: "30px",
+                fontWeight: "bold",
+                textTransform: "none",
+                boxShadow: "0px 4px 15px rgba(0,0,0,0.3)",
+                transition: "0.3s",
+                "&:hover": {
+                  transform: "translateY(-3px)",
+                  boxShadow: "0px 8px 25px rgba(0,0,0,0.5)",
+                },
+              }}
+              disabled={fieldsEmpty}
+            >
+              Sign Up
+            </Button>
+
+            <Grid container justifyContent="center">
+              <Grid item>
+                <RouterLink to="/login" style={{ textDecoration: "none" }}>
+                  <Link
+                    component="span"
+                    variant="body2"
+                    sx={{
+                      color: "#BBDEFB",
+                      "&:hover": { textDecoration: "underline" },
+                    }}
+                  >
+                    Already have an account? Sign In
+                  </Link>
+                </RouterLink>
+              </Grid>
+            </Grid>
+          </Box>
         </Box>
-      </Box>
-    </Container>
+      </Container>
+    </Box>
   );
 }

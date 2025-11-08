@@ -1,16 +1,21 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
-import Typography from "@mui/material/Typography";
-import { TextField } from "@mui/material";
+import {
+  Card,
+  CardContent,
+  Typography,
+  TextField,
+  Button,
+  Box,
+  Autocomplete,
+} from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DesktopDatePicker } from "@mui/x-date-pickers/DesktopDatePicker";
-import Button from "@mui/material/Button";
-import Box from "@mui/material/Box";
-import Autocomplete from "@mui/material/Autocomplete";
 import Cookies from "js-cookie";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import EditIcon from "@mui/icons-material/Edit";
+import CancelIcon from "@mui/icons-material/Cancel";
 
 const InitialForm = {
   amount: 0,
@@ -77,7 +82,6 @@ export default function TransactionForm({
         Authorization: `Bearer ${token}`,
       },
     });
-
     reload(res);
   }
 
@@ -93,44 +97,78 @@ export default function TransactionForm({
         },
       }
     );
-
     reload(res);
   }
 
-  function getCategoryNameById(params) {
+  function getCategoryNameById() {
     return (
       categories.find((category) => category._id === form.category_id) ?? ""
     );
   }
 
   return (
-    <Card sx={{ minWidth: 275, marginTop: 10 }}>
+    <Card
+      sx={{
+        minWidth: 275,
+        mt: 6,
+        p: 3,
+        borderRadius: 3,
+        background: "linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)",
+        boxShadow: "0 8px 20px rgba(0,0,0,0.2)",
+        color: "white",
+      }}
+    >
       <CardContent>
-        <Typography variant="h6" sx={{ marginBottom: 2 }}>
-          {editMode? "Update Transaction" : "Add New Transaction"}
+        <Typography
+          variant="h5"
+          sx={{
+            mb: 3,
+            fontWeight: "bold",
+            textAlign: "center",
+            color: "#ffffff",
+            letterSpacing: 0.5,
+          }}
+        >
+          {editMode ? "Update Transaction" : "Add New Transaction"}
         </Typography>
-        <Box component="form" onSubmit={handleSubmit} sx={{ display: "flex" }}>
+
+        <Box
+          component="form"
+          onSubmit={handleSubmit}
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "center",
+            gap: 3,
+          }}
+        >
           <TextField
             type="number"
-            sx={{ marginRight: 5 }}
-            id="outlined-basic"
-            label="Amount (in EUR)"
+            label="Amount (₹)"
             name="amount"
             variant="outlined"
             size="small"
             value={form.amount}
             onChange={handleChange}
+            sx={{
+              width: 180,
+              bgcolor: "white",
+              borderRadius: 1,
+            }}
           />
           <TextField
             type="text"
-            sx={{ marginRight: 5 }}
-            id="outlined-basic"
             label="Description"
             name="description"
             variant="outlined"
             size="small"
             value={form.description}
             onChange={handleChange}
+            sx={{
+              width: 250,
+              bgcolor: "white",
+              borderRadius: 1,
+            }}
           />
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <DesktopDatePicker
@@ -139,7 +177,15 @@ export default function TransactionForm({
               value={form.date}
               onChange={handleDate}
               renderInput={(params) => (
-                <TextField sx={{ marginRight: 5 }} size="small" {...params} />
+                <TextField
+                  {...params}
+                  size="small"
+                  sx={{
+                    width: 180,
+                    bgcolor: "white",
+                    borderRadius: 1,
+                  }}
+                />
               )}
             />
           </LocalizationProvider>
@@ -149,24 +195,57 @@ export default function TransactionForm({
               const newCategoryId = newValue ? newValue._id : "";
               setForm({ ...form, category_id: newCategoryId });
             }}
-            id="controllable-states-demo"
             options={categories}
-            sx={{ width: 200, marginRight: 5 }}
+            getOptionLabel={(option) => option.name || ""}
+            sx={{
+              width: 200,
+              bgcolor: "white",
+              borderRadius: 1,
+            }}
             renderInput={(params) => (
               <TextField {...params} size="small" label="Category" />
             )}
           />
+
           {editMode ? (
             <>
-              <Button type="submit" color="success" variant="outlined">
+              <Button
+                type="submit"
+                variant="contained"
+                startIcon={<EditIcon />}
+                sx={{
+                  backgroundColor: "#00e676",
+                  "&:hover": { backgroundColor: "#00c853" },
+                }}
+              >
                 Update
               </Button>
-              <Button variant="secondary" onClick={handleCancel}>
+              <Button
+                variant="outlined"
+                startIcon={<CancelIcon />}
+                onClick={handleCancel}
+                sx={{
+                  borderColor: "#ff1744",
+                  color: "#ff1744",
+                  "&:hover": {
+                    borderColor: "#d50000",
+                    backgroundColor: "rgba(255,23,68,0.1)",
+                  },
+                }}
+              >
                 Cancel
               </Button>
             </>
           ) : (
-            <Button type="submit" color="success" variant="contained">
+            <Button
+              type="submit"
+              variant="contained"
+              startIcon={<AddCircleOutlineIcon />}
+              sx={{
+                backgroundColor: "#00b0ff",
+                "&:hover": { backgroundColor: "#0091ea" },
+              }}
+            >
               Submit
             </Button>
           )}
