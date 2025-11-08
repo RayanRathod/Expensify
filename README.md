@@ -1,15 +1,20 @@
-# Expensify 💰
+# Expensify 💰  
+Expensify is a full-stack MERN application that helps users manage personal expenses efficiently.  
+It features user authentication, real-time analytics, and an intuitive dashboard for tracking spending patterns.
 
-Expensify is a full-stack MERN application that helps users track daily expenses and visualize spending patterns with interactive charts.
+## 🚀 Features
+- User registration & login (JWT Authentication)
+- Add, edit, and delete transactions
+- Category and monthly filters
+- Interactive analytics dashboard (charts & insights)
+- Responsive UI with modern gradient theme
 
-## Features
+## 🛠️ Tech Stack
+**Frontend:** React.js, Material-UI, Framer Motion  
+**Backend:** Node.js, Express.js, MongoDB, JWT  
+**Database:** MongoDB Atlas
 
-- Add, edit, and delete expenses
-- Category-wise and monthly filtering
-- Interactive charts using Chart.js
-- Responsive modern UI with gradient theme
-
-## Tech Stack
-
-**Frontend:** React, Framer Motion, React Icons  
-**Backend:** Node.js, Express.js, MongoDB (Atlas)
+## ⚙️ Run Locally
+1. Clone the repository  
+   ```bash
+   git clone https://github.com/RayanRathod/Expensify.git
