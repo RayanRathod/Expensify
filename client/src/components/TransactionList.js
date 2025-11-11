@@ -1,94 +1,104 @@
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
+import React from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Typography,
+  IconButton,
+  Tooltip,
+} from "@mui/material";
 import { useSelector } from "react-redux";
-import { Typography } from "@mui/material";
-import EditSharpIcon from "@mui/icons-material/EditSharp";
-import DeleteSharpIcon from "@mui/icons-material/DeleteSharp";
-import IconButton from "@mui/material/IconButton";
-import dayjs from "dayjs";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 import Cookies from "js-cookie";
+import dayjs from "dayjs";
 
-export default function TransactionList({
+const TransactionList = ({
   data,
   fetchTransactions,
   setEditTransaction,
   editTransaction,
-}) {
+}) => {
   const token = Cookies.get("token");
   const user = useSelector((state) => state.auth.user);
 
-  function categoryName(id) {
-    if (!user) return "Loading...";
-    const category = user.categories.find((c) => c._id === id);
-    return category ? category.icon : "N/A";
-  }
+  const getCategoryIcon = (id) => {
+    if (!user) return "⌛";
+    const category = user.categories.find((cat) => cat._id === id);
+    return category ? category.icon : "❓";
+  };
 
-  async function remove(_id) {
-    if (!window.confirm("Are you sure you want to delete this transaction?"))
-      return;
-    const res = await fetch(
-      `${process.env.REACT_APP_API_URL}/transaction/${_id}`,
-      {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      }
+  const deleteTransaction = async (id) => {
+    const confirmDelete = window.confirm(
+      "Do you really want to delete this transaction?"
     );
-    if (res.ok) fetchTransactions();
-  }
+    if (!confirmDelete) return;
 
-  function formatDate(date) {
-    return dayjs(date).format("DD.MM.YYYY");
-  }
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_API_URL}/transaction/${id}`,
+        {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      if (res.ok) fetchTransactions();
+    } catch (err) {
+      console.error("Error deleting transaction:", err);
+    }
+  };
+
+  const formatDate = (date) => dayjs(date).format("DD MMM, YYYY");
 
   return (
     <>
       <Typography
         variant="h5"
+        align="center"
         sx={{
-          fontWeight: "bold",
-          textAlign: "center",
           mt: 6,
-          mb: 2,
-          letterSpacing: 0.5,
+          mb: 3,
+          fontWeight: 700,
           color: "#1e3c72",
+          letterSpacing: 0.8,
+          textTransform: "uppercase",
         }}
       >
-        Transaction Records
+        Your Transactions
       </Typography>
 
       <TableContainer
         component={Paper}
         sx={{
-          boxShadow: "0 8px 20px rgba(0,0,0,0.15)",
           borderRadius: 3,
           overflow: "hidden",
+          boxShadow: "0px 8px 25px rgba(0,0,0,0.1)",
         }}
       >
-        <Table sx={{ minWidth: 650 }} aria-label="styled table">
+        <Table aria-label="transaction table">
           <TableHead
             sx={{
-              background: "linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)",
+              background: "linear-gradient(135deg, #1e3c72, #2a5298)",
             }}
           >
             <TableRow>
               {["Amount (₹)", "Description", "Category", "Date", "Actions"].map(
-                (head) => (
+                (heading) => (
                   <TableCell
-                    key={head}
+                    key={heading}
                     align="center"
                     sx={{
-                      color: "white",
-                      fontWeight: "bold",
-                      textTransform: "uppercase",
-                      letterSpacing: 0.5,
+                      color: "#fff",
+                      fontWeight: 700,
+                      letterSpacing: 0.7,
+                      fontSize: "0.95rem",
                     }}
                   >
-                    {head}
+                    {heading}
                   </TableCell>
                 )
               )}
@@ -96,55 +106,55 @@ export default function TransactionList({
           </TableHead>
 
           <TableBody>
-            {data.map((month) =>
-              month.transactions.map((row, i) => (
+            {data.flatMap((month) =>
+              month.transactions.map((txn, index) => (
                 <TableRow
-                  key={row._id}
+                  key={txn._id}
                   sx={{
-                    backgroundColor: i % 2 === 0 ? "#f7faff" : "#edf3ff",
+                    backgroundColor: index % 2 === 0 ? "#f8faff" : "#eef4ff",
+                    transition: "background-color 0.3s ease",
                     "&:hover": {
-                      backgroundColor: "#dce7ff",
-                      transition: "0.3s ease",
+                      backgroundColor: "#dce9ff",
                     },
                   }}
                 >
                   <TableCell align="center" sx={{ fontWeight: 600 }}>
-                    ₹{row.amount}
+                    ₹{txn.amount}
                   </TableCell>
-                  <TableCell align="center">{row.description}</TableCell>
-                  <TableCell align="center" sx={{ fontSize: 18 }}>
-                    {categoryName(row.category_id)}
+                  <TableCell align="center">{txn.description}</TableCell>
+                  <TableCell align="center" sx={{ fontSize: 20 }}>
+                    {getCategoryIcon(txn.category_id)}
                   </TableCell>
-                  <TableCell align="center">{formatDate(row.date)}</TableCell>
+                  <TableCell align="center">{formatDate(txn.date)}</TableCell>
+
                   <TableCell align="center">
-                    <IconButton
-                      color="primary"
-                      onClick={() => setEditTransaction(row)}
-                      disabled={editTransaction.amount !== undefined}
-                      sx={{
-                        transition: "0.3s",
-                        "&:hover": {
-                          transform: "scale(1.1)",
-                          color: "#00b0ff",
-                        },
-                      }}
-                    >
-                      <EditSharpIcon />
-                    </IconButton>
-                    <IconButton
-                      color="error"
-                      onClick={() => remove(row._id)}
-                      disabled={editTransaction.amount !== undefined}
-                      sx={{
-                        transition: "0.3s",
-                        "&:hover": {
-                          transform: "scale(1.1)",
-                          color: "#ff1744",
-                        },
-                      }}
-                    >
-                      <DeleteSharpIcon />
-                    </IconButton>
+                    <Tooltip title="Edit Transaction">
+                      <IconButton
+                        color="primary"
+                        onClick={() => setEditTransaction(txn)}
+                        disabled={editTransaction.amount !== undefined}
+                        sx={{
+                          transition: "transform 0.2s ease",
+                          "&:hover": { transform: "scale(1.15)", color: "#0288d1" },
+                        }}
+                      >
+                        <EditIcon />
+                      </IconButton>
+                    </Tooltip>
+
+                    <Tooltip title="Delete Transaction">
+                      <IconButton
+                        color="error"
+                        onClick={() => deleteTransaction(txn._id)}
+                        disabled={editTransaction.amount !== undefined}
+                        sx={{
+                          transition: "transform 0.2s ease",
+                          "&:hover": { transform: "scale(1.15)", color: "#d32f2f" },
+                        }}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </Tooltip>
                   </TableCell>
                 </TableRow>
               ))
@@ -154,4 +164,6 @@ export default function TransactionList({
       </TableContainer>
     </>
   );
-}
+};
+
+export default TransactionList;

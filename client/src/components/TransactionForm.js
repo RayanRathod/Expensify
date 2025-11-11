@@ -8,10 +8,12 @@ import {
   Button,
   Box,
   Autocomplete,
+  useMediaQuery,
 } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { DesktopDatePicker } from "@mui/x-date-pickers/DesktopDatePicker";
+import { DesktopDatePicker, MobileDatePicker } from "@mui/x-date-pickers";
 import Cookies from "js-cookie";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import EditIcon from "@mui/icons-material/Edit";
@@ -35,6 +37,10 @@ export default function TransactionForm({
   const [form, setForm] = useState(InitialForm);
   const [editMode, setEditMode] = useState(false);
 
+  // Responsive setup
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm")); // Mobile
+
   useEffect(() => {
     if (editTransaction.amount !== undefined) {
       setForm(editTransaction);
@@ -45,33 +51,33 @@ export default function TransactionForm({
     }
   }, [editTransaction]);
 
-  function handleChange(e) {
+  const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
-  }
+  };
 
-  function handleDate(newValue) {
+  const handleDate = (newValue) => {
     setForm({ ...form, date: newValue });
-  }
+  };
 
-  function handleSubmit(e) {
+  const handleSubmit = (e) => {
     e.preventDefault();
     editMode ? update() : create();
-  }
+  };
 
-  function handleCancel() {
+  const handleCancel = () => {
     setForm(InitialForm);
     setEditMode(false);
     setEditTransaction({});
-  }
+  };
 
-  function reload(res) {
+  const reload = (res) => {
     if (res.ok) {
       setForm(InitialForm);
       setEditMode(false);
       setEditTransaction({});
       fetchTransactions();
     }
-  }
+  };
 
   async function create() {
     const res = await fetch(`${process.env.REACT_APP_API_URL}/transaction`, {
@@ -100,27 +106,25 @@ export default function TransactionForm({
     reload(res);
   }
 
-  function getCategoryNameById() {
-    return (
-      categories.find((category) => category._id === form.category_id) ?? ""
-    );
-  }
+  const getCategoryNameById = () =>
+    categories.find((category) => category._id === form.category_id) ?? "";
 
   return (
     <Card
       sx={{
-        minWidth: 275,
-        mt: 6,
-        p: 3,
+        width: { xs: "90%", sm: "80%", md: "65%", lg: "55%" },
+        mt: { xs: 4, md: 6 },
+        mx: "auto",
         borderRadius: 3,
         background: "linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)",
         boxShadow: "0 8px 20px rgba(0,0,0,0.2)",
         color: "white",
+        p: { xs: 2, sm: 3 },
       }}
     >
       <CardContent>
         <Typography
-          variant="h5"
+          variant={isSmallScreen ? "h6" : "h5"}
           sx={{
             mb: 3,
             fontWeight: "bold",
@@ -137,9 +141,11 @@ export default function TransactionForm({
           onSubmit={handleSubmit}
           sx={{
             display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
             flexWrap: "wrap",
             justifyContent: "center",
-            gap: 3,
+            gap: { xs: 2, sm: 3 },
+            alignItems: "center",
           }}
         >
           <TextField
@@ -151,11 +157,12 @@ export default function TransactionForm({
             value={form.amount}
             onChange={handleChange}
             sx={{
-              width: 180,
+              width: { xs: "100%", sm: 180 },
               bgcolor: "white",
               borderRadius: 1,
             }}
           />
+
           <TextField
             type="text"
             label="Description"
@@ -165,30 +172,52 @@ export default function TransactionForm({
             value={form.description}
             onChange={handleChange}
             sx={{
-              width: 250,
+              width: { xs: "100%", sm: 250 },
               bgcolor: "white",
               borderRadius: 1,
             }}
           />
+
           <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <DesktopDatePicker
-              label="Transaction Date"
-              inputFormat="DD.MM.YYYY"
-              value={form.date}
-              onChange={handleDate}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  size="small"
-                  sx={{
-                    width: 180,
-                    bgcolor: "white",
-                    borderRadius: 1,
-                  }}
-                />
-              )}
-            />
+            {isSmallScreen ? (
+              <MobileDatePicker
+                label="Transaction Date"
+                inputFormat="DD.MM.YYYY"
+                value={form.date}
+                onChange={handleDate}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    size="small"
+                    sx={{
+                      width: "100%",
+                      bgcolor: "white",
+                      borderRadius: 1,
+                    }}
+                  />
+                )}
+              />
+            ) : (
+              <DesktopDatePicker
+                label="Transaction Date"
+                inputFormat="DD.MM.YYYY"
+                value={form.date}
+                onChange={handleDate}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    size="small"
+                    sx={{
+                      width: { xs: "100%", sm: 180 },
+                      bgcolor: "white",
+                      borderRadius: 1,
+                    }}
+                  />
+                )}
+              />
+            )}
           </LocalizationProvider>
+
           <Autocomplete
             value={getCategoryNameById()}
             onChange={(event, newValue) => {
@@ -198,7 +227,7 @@ export default function TransactionForm({
             options={categories}
             getOptionLabel={(option) => option.name || ""}
             sx={{
-              width: 200,
+              width: { xs: "100%", sm: 200 },
               bgcolor: "white",
               borderRadius: 1,
             }}
@@ -207,48 +236,62 @@ export default function TransactionForm({
             )}
           />
 
-          {editMode ? (
-            <>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "center",
+              gap: 2,
+              mt: { xs: 2, sm: 0 },
+              width: { xs: "100%", sm: "auto" },
+            }}
+          >
+            {editMode ? (
+              <>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  startIcon={<EditIcon />}
+                  sx={{
+                    backgroundColor: "#00e676",
+                    "&:hover": { backgroundColor: "#00c853" },
+                    width: { xs: "100%", sm: "auto" },
+                  }}
+                >
+                  Update
+                </Button>
+                <Button
+                  variant="outlined"
+                  startIcon={<CancelIcon />}
+                  onClick={handleCancel}
+                  sx={{
+                    borderColor: "#ff1744",
+                    color: "#ff1744",
+                    "&:hover": {
+                      borderColor: "#d50000",
+                      backgroundColor: "rgba(255,23,68,0.1)",
+                    },
+                    width: { xs: "100%", sm: "auto" },
+                  }}
+                >
+                  Cancel
+                </Button>
+              </>
+            ) : (
               <Button
                 type="submit"
                 variant="contained"
-                startIcon={<EditIcon />}
+                startIcon={<AddCircleOutlineIcon />}
                 sx={{
-                  backgroundColor: "#00e676",
-                  "&:hover": { backgroundColor: "#00c853" },
+                  backgroundColor: "#00b0ff",
+                  "&:hover": { backgroundColor: "#0091ea" },
+                  width: { xs: "100%", sm: "auto" },
                 }}
               >
-                Update
+                Submit
               </Button>
-              <Button
-                variant="outlined"
-                startIcon={<CancelIcon />}
-                onClick={handleCancel}
-                sx={{
-                  borderColor: "#ff1744",
-                  color: "#ff1744",
-                  "&:hover": {
-                    borderColor: "#d50000",
-                    backgroundColor: "rgba(255,23,68,0.1)",
-                  },
-                }}
-              >
-                Cancel
-              </Button>
-            </>
-          ) : (
-            <Button
-              type="submit"
-              variant="contained"
-              startIcon={<AddCircleOutlineIcon />}
-              sx={{
-                backgroundColor: "#00b0ff",
-                "&:hover": { backgroundColor: "#0091ea" },
-              }}
-            >
-              Submit
-            </Button>
-          )}
+            )}
+          </Box>
         </Box>
       </CardContent>
     </Card>

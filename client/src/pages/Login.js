@@ -62,18 +62,23 @@ export default function Login() {
         justifyContent: "center",
         alignItems: "center",
         color: "white",
+        px: { xs: 2, sm: 3 }, // ✅ responsive horizontal padding
+        py: { xs: 4, sm: 6 }, // ✅ responsive vertical padding
       }}
     >
       <Container component="main" maxWidth="xs">
         <CssBaseline />
         <Box
           sx={{
-            padding: 4,
+            padding: { xs: 3, sm: 4 },
             borderRadius: 4,
             backgroundColor: "rgba(255, 255, 255, 0.15)",
             backdropFilter: "blur(12px)",
             boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
             textAlign: "center",
+            width: "100%",
+            maxWidth: "400px",
+            mx: "auto",
           }}
         >
           <Avatar
@@ -82,10 +87,13 @@ export default function Login() {
               mb: 2,
               bgcolor: "rgba(255,255,255,0.3)",
               color: "#1E3C72",
+              width: { xs: 56, sm: 64 },
+              height: { xs: 56, sm: 64 },
             }}
           >
-            <LockOutlinedIcon />
+            <LockOutlinedIcon sx={{ fontSize: { xs: 28, sm: 32 } }} />
           </Avatar>
+
           <Typography
             component="h1"
             variant="h5"
@@ -93,6 +101,7 @@ export default function Login() {
               fontWeight: "bold",
               mb: 3,
               textShadow: "1px 1px 10px rgba(0,0,0,0.3)",
+              fontSize: { xs: "1.4rem", sm: "1.6rem" },
             }}
           >
             Sign In to Expense Tracker
@@ -115,10 +124,16 @@ export default function Login() {
               InputProps={{
                 style: {
                   color: "white",
-                  borderColor: "#E0E0E0",
+                },
+              }}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": { borderColor: "#E0E0E0" },
+                  "&:hover fieldset": { borderColor: "#90CAF9" },
                 },
               }}
             />
+
             <TextField
               margin="normal"
               required
@@ -137,6 +152,12 @@ export default function Login() {
                   color: "white",
                 },
               }}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": { borderColor: "#E0E0E0" },
+                  "&:hover fieldset": { borderColor: "#90CAF9" },
+                },
+              }}
             />
 
             <Button
@@ -152,6 +173,8 @@ export default function Login() {
                 fontWeight: "bold",
                 textTransform: "none",
                 boxShadow: "0px 4px 15px rgba(0,0,0,0.3)",
+                fontSize: { xs: "0.9rem", sm: "1rem" },
+                py: { xs: 1.1, sm: 1.4 },
                 transition: "0.3s",
                 "&:hover": {
                   transform: "translateY(-3px)",
@@ -172,6 +195,7 @@ export default function Login() {
                     sx={{
                       color: "#BBDEFB",
                       "&:hover": { textDecoration: "underline" },
+                      fontSize: { xs: "0.85rem", sm: "0.95rem" },
                     }}
                   >
                     Don’t have an account? Sign Up

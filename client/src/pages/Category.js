@@ -1,19 +1,24 @@
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
+import React, { useState } from "react";
+import {
+  Container,
+  Typography,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  IconButton,
+  Box,
+  Tooltip,
+} from "@mui/material";
 import { useSelector, useDispatch } from "react-redux";
-import { Container, Typography } from "@mui/material";
-import EditSharpIcon from "@mui/icons-material/EditSharp";
-import DeleteSharpIcon from "@mui/icons-material/DeleteSharp";
-import IconButton from "@mui/material/IconButton";
 import Cookies from "js-cookie";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 import { setUser } from "../store/auth";
 import CategoryForm from "../components/CategoryForm";
-import { useState } from "react";
 
 export default function Category() {
   const token = Cookies.get("token");
@@ -21,150 +26,177 @@ export default function Category() {
   const dispatch = useDispatch();
   const [editCategory, setEditCategory] = useState({});
 
-  function setEdit(category) {
+  const handleEdit = (category) => {
     setEditCategory(category);
-  }
+  };
 
-  async function remove(id) {
-    if (!window.confirm("Are you sure you want to delete this category?"))
-      return;
+  const handleDelete = async (id) => {
+    const confirmDelete = window.confirm("Do you really want to delete this category?");
+    if (!confirmDelete) return;
 
-    const res = await fetch(`${process.env.REACT_APP_API_URL}/category/${id}`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    try {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/category/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-    if (res.ok) {
-      const updatedUser = {
-        ...user,
-        categories: user.categories.filter((cat) => cat._id !== id),
-      };
-      dispatch(setUser({ user: updatedUser }));
+      if (res.ok) {
+        const updatedUser = {
+          ...user,
+          categories: user.categories.filter((cat) => cat._id !== id),
+        };
+        dispatch(setUser({ user: updatedUser }));
+      }
+    } catch (error) {
+      console.error("Error deleting category:", error);
     }
-  }
+  };
 
   return (
-    <Container sx={{ mt: 6, mb: 6 }}>
+    <Container
+      maxWidth="md"
+      sx={{
+        mt: 6,
+        mb: 6,
+        px: { xs: 2, sm: 3 },
+      }}
+    >
       {/* Category Form */}
-      <CategoryForm
-        editCategory={editCategory}
-        setEditCategory={setEditCategory}
-      />
+      <CategoryForm editCategory={editCategory} setEditCategory={setEditCategory} />
 
-      {/* Table Title */}
+      {/* Title */}
       <Typography
         variant="h5"
+        align="center"
         sx={{
-          textAlign: "center",
-          fontWeight: "bold",
-          letterSpacing: 0.6,
           mt: 8,
-          mb: 2,
+          mb: 3,
+          fontWeight: 700,
+          letterSpacing: 0.6,
           color: "#1e3c72",
+          textTransform: "uppercase",
         }}
       >
-        Your Categories
+        Manage Your Categories
       </Typography>
 
-      {/* Styled Table */}
-      <TableContainer
-        component={Paper}
+      {/* Table Section */}
+      <Box
         sx={{
+          overflowX: "auto", // Enables horizontal scroll on small screens
           borderRadius: 3,
-          overflow: "hidden",
-          boxShadow: "0 6px 18px rgba(0,0,0,0.15)",
+          boxShadow: "0px 8px 24px rgba(0,0,0,0.12)",
         }}
       >
-        <Table sx={{ minWidth: 650 }} aria-label="styled table">
-          <TableHead
-            sx={{
-              background: "linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)",
-            }}
-          >
-            <TableRow>
-              {["Label", "Icon", "Actions"].map((header) => (
-                <TableCell
-                  key={header}
-                  align="center"
-                  sx={{
-                    color: "white",
-                    fontWeight: "bold",
-                    textTransform: "uppercase",
-                    letterSpacing: 0.5,
-                  }}
-                >
-                  {header}
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-
-          <TableBody>
-            {user?.categories?.map((row, index) => (
-              <TableRow
-                key={row._id}
-                sx={{
-                  backgroundColor: index % 2 === 0 ? "#f5f8ff" : "#ebf2ff",
-                  "&:hover": {
-                    backgroundColor: "#dce7ff",
-                    transition: "0.3s ease",
-                  },
-                }}
-              >
-                <TableCell
-                  align="center"
-                  component="th"
-                  scope="row"
-                  sx={{ fontWeight: 500 }}
-                >
-                  {row.label}
-                </TableCell>
-
-                <TableCell
-                  align="center"
-                  sx={{
-                    fontSize: 22,
-                  }}
-                >
-                  {row.icon}
-                </TableCell>
-
-                <TableCell align="center">
-                  <IconButton
-                    color="primary"
-                    onClick={() => setEdit(row)}
-                    disabled={editCategory.label !== undefined}
+        <TableContainer
+          component={Paper}
+          sx={{
+            borderRadius: 3,
+            overflow: "hidden",
+            minWidth: 400,
+          }}
+        >
+          <Table aria-label="categories table">
+            <TableHead
+              sx={{
+                background: "linear-gradient(135deg, #1e3c72, #2a5298)",
+              }}
+            >
+              <TableRow>
+                {["Label", "Icon", "Actions"].map((header) => (
+                  <TableCell
+                    key={header}
+                    align="center"
                     sx={{
-                      transition: "0.3s",
-                      "&:hover": {
-                        transform: "scale(1.1)",
-                        color: "#00b0ff",
-                      },
+                      color: "#fff",
+                      fontWeight: 700,
+                      textTransform: "uppercase",
+                      letterSpacing: 0.7,
+                      fontSize: "0.95rem",
+                      whiteSpace: "nowrap",
                     }}
                   >
-                    <EditSharpIcon />
-                  </IconButton>
-
-                  <IconButton
-                    color="error"
-                    onClick={() => remove(row._id)}
-                    disabled={editCategory.label !== undefined}
-                    sx={{
-                      transition: "0.3s",
-                      "&:hover": {
-                        transform: "scale(1.1)",
-                        color: "#ff1744",
-                      },
-                    }}
-                  >
-                    <DeleteSharpIcon />
-                  </IconButton>
-                </TableCell>
+                    {header}
+                  </TableCell>
+                ))}
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+            </TableHead>
+
+            <TableBody>
+              {user?.categories?.length > 0 ? (
+                user.categories.map((row, index) => (
+                  <TableRow
+                    key={row._id}
+                    sx={{
+                      backgroundColor: index % 2 === 0 ? "#f8faff" : "#eef4ff",
+                      transition: "all 0.3s ease",
+                      "&:hover": {
+                        backgroundColor: "#dce9ff",
+                        transform: "scale(1.01)",
+                      },
+                    }}
+                  >
+                    <TableCell
+                      align="center"
+                      sx={{
+                        fontWeight: 500,
+                        fontSize: "1rem",
+                      }}
+                    >
+                      {row.label}
+                    </TableCell>
+
+                    <TableCell
+                      align="center"
+                      sx={{
+                        fontSize: "1.6rem",
+                      }}
+                    >
+                      {row.icon}
+                    </TableCell>
+
+                    <TableCell align="center">
+                      <Tooltip title="Edit Category">
+                        <IconButton
+                          color="primary"
+                          onClick={() => handleEdit(row)}
+                          disabled={editCategory.label !== undefined}
+                          sx={{
+                            transition: "0.3s",
+                            "&:hover": { transform: "scale(1.15)", color: "#0288d1" },
+                          }}
+                        >
+                          <EditIcon />
+                        </IconButton>
+                      </Tooltip>
+
+                      <Tooltip title="Delete Category">
+                        <IconButton
+                          color="error"
+                          onClick={() => handleDelete(row._id)}
+                          disabled={editCategory.label !== undefined}
+                          sx={{
+                            transition: "0.3s",
+                            "&:hover": { transform: "scale(1.15)", color: "#d32f2f" },
+                          }}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </Tooltip>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={3} align="center" sx={{ py: 4, color: "#666" }}>
+                    No categories found. Add one above 👆
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Box>
     </Container>
   );
 }

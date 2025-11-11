@@ -15,28 +15,48 @@ import {
 } from "@devexpress/dx-react-chart";
 import { scaleBand } from "@devexpress/dx-chart-core";
 import dayjs from "dayjs";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import { useTheme } from "@mui/material/styles";
 
 export default function TransactionChart({ data }) {
-  // Format incoming data to show month names
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm")); // Mobile
+  const isMediumScreen = useMediaQuery(theme.breakpoints.between("sm", "md")); // Tablet
+
+  // Format data to month names
   const chartData = data.map((item) => ({
     ...item,
     month: dayjs().month(item._id - 1).format("MMMM"),
   }));
 
+  // Adjust chart size dynamically
+  const chartWidth = isSmallScreen ? 320 : isMediumScreen ? 500 : 700;
+  const chartHeight = isSmallScreen ? 250 : isMediumScreen ? 320 : 400;
+
   return (
     <Paper
       elevation={6}
       sx={{
-        p: 3,
-        mt: 4,
+        p: { xs: 2, sm: 3 },
+        mt: { xs: 3, sm: 4 },
         borderRadius: 3,
         background: "linear-gradient(135deg, #6a11cb 0%, #2575fc 100%)",
         color: "#fff",
         boxShadow: "0 6px 20px rgba(0,0,0,0.25)",
+        maxWidth: "95%",
+        mx: "auto",
+        overflowX: "auto",
       }}
     >
-      <Chart data={chartData}>
+      <Chart
+        data={chartData}
+        width={chartWidth}
+        height={chartHeight}
+        style={{ minWidth: 300 }}
+      >
         <ArgumentScale factory={scaleBand} />
+
+        {/* X-Axis */}
         <ArgumentAxis
           showLine
           showTicks
@@ -45,19 +65,21 @@ export default function TransactionChart({ data }) {
               {...props}
               style={{
                 fill: "#fff",
-                fontSize: "0.85rem",
+                fontSize: isSmallScreen ? "0.7rem" : "0.85rem",
                 fontWeight: 500,
               }}
             />
           )}
         />
+
+        {/* Y-Axis */}
         <ValueAxis
           labelComponent={(props) => (
             <ValueAxis.Label
               {...props}
               style={{
                 fill: "#fff",
-                fontSize: "0.85rem",
+                fontSize: isSmallScreen ? "0.7rem" : "0.85rem",
                 fontWeight: 500,
               }}
             />
@@ -83,12 +105,15 @@ export default function TransactionChart({ data }) {
                 padding: "6px 10px",
                 borderRadius: "6px",
                 boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+                fontSize: "0.8rem",
               }}
             >
               {text}
             </div>
           )}
         />
+
+        {/* Chart Title */}
         <Title
           text="Monthly Expense Overview"
           textComponent={({ text }) => (
@@ -96,7 +121,7 @@ export default function TransactionChart({ data }) {
               style={{
                 textAlign: "center",
                 color: "#fff",
-                fontSize: "1.1rem",
+                fontSize: isSmallScreen ? "1rem" : "1.2rem",
                 fontWeight: 600,
                 marginBottom: "10px",
               }}
@@ -107,7 +132,7 @@ export default function TransactionChart({ data }) {
         />
       </Chart>
 
-      {/* Custom Gradient for Bar Color */}
+      {/* Gradient for Bars */}
       <svg width="0" height="0">
         <defs>
           <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">

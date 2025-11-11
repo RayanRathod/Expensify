@@ -33,6 +33,11 @@ export default function Home() {
         boxShadow: "0px 10px 25px rgba(0,0,0,0.3)",
         marginTop: 6,
         color: "white",
+        minHeight: "100vh", // ✅ ensures full screen height
+        pb: 6, // ✅ adds bottom padding to avoid cutoff
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "flex-start",
       }}
     >
       <Typography
@@ -77,6 +82,7 @@ export default function Home() {
               borderRadius: 3,
               backgroundColor: "rgba(255,255,255,0.1)",
               backdropFilter: "blur(8px)",
+              height: "100%",
             }}
           >
             <Typography
@@ -107,6 +113,7 @@ export default function Home() {
               borderRadius: 3,
               backgroundColor: "rgba(255,255,255,0.1)",
               backdropFilter: "blur(8px)",
+              height: "100%",
             }}
           >
             <Typography

@@ -7,7 +7,15 @@ import {
   Button,
   IconButton,
   Tooltip,
+  Drawer,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  useMediaQuery,
 } from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
 import LogoutIcon from "@mui/icons-material/Logout";
 import CategoryIcon from "@mui/icons-material/Category";
 import DashboardIcon from "@mui/icons-material/Dashboard";
@@ -24,12 +32,29 @@ export default function NavBar() {
   const navigate = useNavigate();
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
   const user = useSelector((state) => state.auth.user);
+  const [drawerOpen, setDrawerOpen] = React.useState(false);
+
+  const isMobile = useMediaQuery("(max-width:768px)");
 
   function handleLogout() {
     Cookies.remove("token");
     dispatch(logOut());
     navigate("/login");
   }
+
+  const toggleDrawer = (open) => () => {
+    setDrawerOpen(open);
+  };
+
+  const menuItems = isAuthenticated
+    ? [
+        { text: "Dashboard", icon: <DashboardIcon />, path: "/dashboard" },
+        { text: "Categories", icon: <CategoryIcon />, path: "/category" },
+      ]
+    : [
+        { text: "Login", icon: <LoginIcon />, path: "/login" },
+        { text: "Register", icon: <HowToRegIcon />, path: "/register" },
+      ];
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -41,7 +66,7 @@ export default function NavBar() {
         }}
       >
         <Toolbar>
-          {/* App Logo / Name */}
+          {/* Left Section - App Name */}
           <Typography
             variant="h6"
             component="div"
@@ -63,118 +88,135 @@ export default function NavBar() {
                 fontWeight: "bold",
               }}
             >
-              SmartSpendr
+              Expensify
             </Link>
           </Typography>
 
-          {/* User Info */}
-          {user && isAuthenticated && (
-            <Typography
+          {/* Desktop View */}
+          {!isMobile && (
+            <>
+              {user && isAuthenticated && (
+                <Typography
+                  sx={{
+                    marginRight: 2,
+                    fontStyle: "italic",
+                    fontSize: "0.9rem",
+                    color: "rgba(255,255,255,0.9)",
+                  }}
+                >
+                  Hello, {user.firstName}
+                </Typography>
+              )}
+
+              {menuItems.map((item) => (
+                <Link
+                  key={item.text}
+                  to={item.path}
+                  style={{ textDecoration: "none", color: "inherit" }}
+                >
+                  <Button
+                    color="inherit"
+                    startIcon={item.icon}
+                    sx={{
+                      mx: 1,
+                      textTransform: "none",
+                      "&:hover": {
+                        backgroundColor: "rgba(255,255,255,0.15)",
+                      },
+                    }}
+                  >
+                    {item.text}
+                  </Button>
+                </Link>
+              ))}
+
+              {isAuthenticated && (
+                <Tooltip title="Logout">
+                  <IconButton
+                    color="inherit"
+                    onClick={handleLogout}
+                    sx={{
+                      ml: 1,
+                      "&:hover": {
+                        backgroundColor: "rgba(255,255,255,0.15)",
+                      },
+                    }}
+                  >
+                    <LogoutIcon />
+                  </IconButton>
+                </Tooltip>
+              )}
+            </>
+          )}
+
+          {/* Mobile Menu Button */}
+          {isMobile && (
+            <IconButton
+              color="inherit"
+              edge="end"
+              onClick={toggleDrawer(true)}
               sx={{
-                marginRight: 2,
-                fontStyle: "italic",
-                fontSize: "0.9rem",
-                color: "rgba(255,255,255,0.9)",
+                "&:hover": {
+                  backgroundColor: "rgba(255,255,255,0.15)",
+                },
               }}
             >
-              Hello, {user.firstName}
-            </Typography>
-          )}
-
-          {/* Authenticated Menu */}
-          {isAuthenticated && (
-            <>
-              <Link
-                to="/dashboard"
-                style={{ textDecoration: "none", color: "inherit" }}
-              >
-                <Button
-                  color="inherit"
-                  startIcon={<DashboardIcon />}
-                  sx={{
-                    mx: 1,
-                    textTransform: "none",
-                    "&:hover": {
-                      backgroundColor: "rgba(255,255,255,0.15)",
-                    },
-                  }}
-                >
-                  Dashboard
-                </Button>
-              </Link>
-
-              <Link
-                to="/category"
-                style={{ textDecoration: "none", color: "inherit" }}
-              >
-                <Button
-                  color="inherit"
-                  startIcon={<CategoryIcon />}
-                  sx={{
-                    mx: 1,
-                    textTransform: "none",
-                    "&:hover": {
-                      backgroundColor: "rgba(255,255,255,0.15)",
-                    },
-                  }}
-                >
-                  Categories
-                </Button>
-              </Link>
-
-              <Tooltip title="Logout">
-                <IconButton
-                  color="inherit"
-                  onClick={handleLogout}
-                  sx={{
-                    ml: 1,
-                    "&:hover": {
-                      backgroundColor: "rgba(255,255,255,0.15)",
-                    },
-                  }}
-                >
-                  <LogoutIcon />
-                </IconButton>
-              </Tooltip>
-            </>
-          )}
-
-          {/* Guest Menu */}
-          {!isAuthenticated && (
-            <>
-              <Link to="/login" style={{ textDecoration: "none" }}>
-                <Button
-                  color="inherit"
-                  startIcon={<LoginIcon />}
-                  sx={{
-                    textTransform: "none",
-                    "&:hover": {
-                      backgroundColor: "rgba(255,255,255,0.15)",
-                    },
-                  }}
-                >
-                  Login
-                </Button>
-              </Link>
-
-              <Link to="/register" style={{ textDecoration: "none" }}>
-                <Button
-                  color="inherit"
-                  startIcon={<HowToRegIcon />}
-                  sx={{
-                    textTransform: "none",
-                    "&:hover": {
-                      backgroundColor: "rgba(255,255,255,0.15)",
-                    },
-                  }}
-                >
-                  Register
-                </Button>
-              </Link>
-            </>
+              <MenuIcon />
+            </IconButton>
           )}
         </Toolbar>
       </AppBar>
+
+      {/* Mobile Drawer */}
+      <Drawer anchor="right" open={drawerOpen} onClose={toggleDrawer(false)}>
+        <Box
+          sx={{
+            width: 250,
+            background: "linear-gradient(135deg, #6a11cb 0%, #2575fc 100%)",
+            height: "100%",
+            color: "#fff",
+          }}
+          role="presentation"
+          onClick={toggleDrawer(false)}
+        >
+          <Box sx={{ p: 2, borderBottom: "1px solid rgba(255,255,255,0.3)" }}>
+            <Typography
+              variant="h6"
+              sx={{ fontWeight: "bold", display: "flex", alignItems: "center", gap: 1 }}
+            >
+              <SavingsIcon />
+              Expensify
+            </Typography>
+            {user && isAuthenticated && (
+              <Typography sx={{ fontSize: "0.85rem", opacity: 0.9 }}>
+                Hello, {user.firstName}
+              </Typography>
+            )}
+          </Box>
+
+          <List>
+            {menuItems.map((item) => (
+              <ListItem key={item.text} disablePadding>
+                <ListItemButton component={Link} to={item.path}>
+                  <ListItemIcon sx={{ color: "white" }}>{item.icon}</ListItemIcon>
+                  <ListItemText primary={item.text} />
+                </ListItemButton>
+              </ListItem>
+            ))}
+
+            {isAuthenticated && (
+              <ListItem disablePadding>
+                <ListItemButton onClick={handleLogout}>
+                  <ListItemIcon sx={{ color: "white" }}>
+                    <LogoutIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Logout" />
+                </ListItemButton>
+              </ListItem>
+            )}
+          </List>
+        </Box>
+      </Drawer>
     </Box>
   );
 }

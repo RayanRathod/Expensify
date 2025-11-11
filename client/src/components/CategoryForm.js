@@ -9,8 +9,15 @@ import {
   Box,
   Autocomplete,
   IconButton,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
-import { Category, AttachMoney, ShoppingCart, TrendingUp } from "@mui/icons-material";
+import {
+  Category,
+  AttachMoney,
+  ShoppingCart,
+  TrendingUp,
+} from "@mui/icons-material";
 import Cookies from "js-cookie";
 import { setUser } from "../store/auth";
 
@@ -32,6 +39,9 @@ export default function CategoryForm({ editCategory, setEditCategory }) {
   const dispatch = useDispatch();
   const [form, setForm] = useState(initialCategory);
   const [isEditing, setIsEditing] = useState(false);
+
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   useEffect(() => {
     if (editCategory?._id) {
@@ -107,7 +117,8 @@ export default function CategoryForm({ editCategory, setEditCategory }) {
   return (
     <Card
       sx={{
-        minWidth: 320,
+        width: "90%",
+        maxWidth: 500,
         mt: 10,
         mx: "auto",
         borderRadius: 3,
@@ -120,7 +131,7 @@ export default function CategoryForm({ editCategory, setEditCategory }) {
         <Typography
           variant="h6"
           sx={{
-            mb: 2,
+            mb: 3,
             textAlign: "center",
             fontWeight: 600,
             letterSpacing: 0.5,
@@ -134,12 +145,14 @@ export default function CategoryForm({ editCategory, setEditCategory }) {
           onSubmit={handleSubmit}
           sx={{
             display: "flex",
+            flexDirection: isMobile ? "column" : "row",
             gap: 2,
             flexWrap: "wrap",
             alignItems: "center",
             justifyContent: "center",
           }}
         >
+          {/* Category Name */}
           <TextField
             label="Category Name"
             name="label"
@@ -150,10 +163,11 @@ export default function CategoryForm({ editCategory, setEditCategory }) {
             sx={{
               bgcolor: "white",
               borderRadius: 1,
-              width: "220px",
+              width: isMobile ? "100%" : "220px",
             }}
           />
 
+          {/* Icon Selector */}
           <Autocomplete
             options={iconOptions}
             getOptionLabel={(option) => option.label}
@@ -161,7 +175,11 @@ export default function CategoryForm({ editCategory, setEditCategory }) {
               setForm({ ...form, icon: newValue?.label || "" })
             }
             renderOption={(props, option) => (
-              <Box component="li" {...props} sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <Box
+                component="li"
+                {...props}
+                sx={{ display: "flex", alignItems: "center", gap: 1 }}
+              >
                 <IconButton size="small" color="primary">
                   {option.icon}
                 </IconButton>
@@ -173,47 +191,66 @@ export default function CategoryForm({ editCategory, setEditCategory }) {
                 {...params}
                 label="Select Icon"
                 size="small"
-                sx={{ bgcolor: "white", borderRadius: 1, width: "220px" }}
+                sx={{
+                  bgcolor: "white",
+                  borderRadius: 1,
+                  width: isMobile ? "100%" : "220px",
+                }}
               />
             )}
           />
 
-          {isEditing ? (
-            <>
+          {/* Buttons */}
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: isMobile ? "column" : "row",
+              gap: 1.5,
+              justifyContent: "center",
+              width: isMobile ? "100%" : "auto",
+              mt: isMobile ? 1 : 0,
+            }}
+          >
+            {isEditing ? (
+              <>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  fullWidth={isMobile}
+                  sx={{
+                    bgcolor: "#00e676",
+                    "&:hover": { bgcolor: "#00c853" },
+                  }}
+                >
+                  Update
+                </Button>
+                <Button
+                  variant="outlined"
+                  fullWidth={isMobile}
+                  sx={{
+                    color: "#fff",
+                    borderColor: "#fff",
+                    "&:hover": { bgcolor: "rgba(255,255,255,0.1)" },
+                  }}
+                  onClick={handleCancel}
+                >
+                  Cancel
+                </Button>
+              </>
+            ) : (
               <Button
                 type="submit"
                 variant="contained"
+                fullWidth={isMobile}
                 sx={{
-                  bgcolor: "#00e676",
-                  "&:hover": { bgcolor: "#00c853" },
+                  bgcolor: "#00e5ff",
+                  "&:hover": { bgcolor: "#00b8d4" },
                 }}
               >
-                Update
+                Add
               </Button>
-              <Button
-                variant="outlined"
-                sx={{
-                  color: "#fff",
-                  borderColor: "#fff",
-                  "&:hover": { bgcolor: "rgba(255,255,255,0.1)" },
-                }}
-                onClick={handleCancel}
-              >
-                Cancel
-              </Button>
-            </>
-          ) : (
-            <Button
-              type="submit"
-              variant="contained"
-              sx={{
-                bgcolor: "#00e5ff",
-                "&:hover": { bgcolor: "#00b8d4" },
-              }}
-            >
-              Add
-            </Button>
-          )}
+            )}
+          </Box>
         </Box>
       </CardContent>
     </Card>

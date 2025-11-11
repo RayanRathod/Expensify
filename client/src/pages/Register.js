@@ -56,13 +56,14 @@ export default function Register() {
         justifyContent: "center",
         alignItems: "center",
         color: "white",
+        padding: { xs: 2, sm: 3, md: 4 },
       }}
     >
       <Container component="main" maxWidth="xs">
         <CssBaseline />
         <Box
           sx={{
-            padding: 4,
+            padding: { xs: 3, sm: 4 },
             borderRadius: 4,
             backgroundColor: "rgba(255, 255, 255, 0.15)",
             backdropFilter: "blur(12px)",
@@ -76,10 +77,13 @@ export default function Register() {
               mb: 2,
               bgcolor: "rgba(255,255,255,0.3)",
               color: "#1E3C72",
+              width: 60,
+              height: 60,
             }}
           >
-            <LockOutlinedIcon />
+            <LockOutlinedIcon fontSize="large" />
           </Avatar>
+
           <Typography
             component="h1"
             variant="h5"
@@ -87,6 +91,7 @@ export default function Register() {
               fontWeight: "bold",
               mb: 3,
               textShadow: "1px 1px 10px rgba(0,0,0,0.3)",
+              fontSize: { xs: "1.4rem", sm: "1.7rem" },
             }}
           >
             Create Your Account
@@ -173,11 +178,13 @@ export default function Register() {
               sx={{
                 mt: 3,
                 mb: 2,
+                py: 1.5,
                 background:
                   "linear-gradient(135deg, #6A5ACD 0%, #1E90FF 100%)",
                 borderRadius: "30px",
                 fontWeight: "bold",
                 textTransform: "none",
+                fontSize: { xs: "0.9rem", sm: "1rem" },
                 boxShadow: "0px 4px 15px rgba(0,0,0,0.3)",
                 transition: "0.3s",
                 "&:hover": {
@@ -199,6 +206,7 @@ export default function Register() {
                     sx={{
                       color: "#BBDEFB",
                       "&:hover": { textDecoration: "underline" },
+                      fontSize: { xs: "0.85rem", sm: "0.9rem" },
                     }}
                   >
                     Already have an account? Sign In
